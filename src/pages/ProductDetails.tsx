@@ -6,8 +6,10 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Star, ShoppingCart, Minus, Plus, Package, Shield, Truck } from 'lucide-react';
+import { Star, ShoppingCart, Minus, Plus, Package, Shield, Truck, Heart } from 'lucide-react';
 import { dummyProducts, dummyReviews } from '@/data/dummyData';
+import { useWishlist } from '@/hooks/useWishlist';
+import { cn } from '@/lib/utils';
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -15,6 +17,17 @@ const ProductDetails = () => {
   const productReviews = dummyReviews.filter(r => r.productId === id);
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
+  const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
+  const inWishlist = product ? isInWishlist(product.id) : false;
+
+  const handleWishlistToggle = () => {
+    if (!product) return;
+    if (inWishlist) {
+      removeFromWishlist(product.id);
+    } else {
+      addToWishlist(product.id);
+    }
+  };
 
   if (!product) {
     return <div>Product not found</div>;
@@ -125,10 +138,20 @@ const ProductDetails = () => {
                   </span>
                 </div>
 
-                <Button size="lg" className="w-full">
-                  <ShoppingCart className="mr-2 h-5 w-5" />
-                  Add to Cart
-                </Button>
+                <div className="flex gap-3">
+                  <Button size="lg" className="flex-1">
+                    <ShoppingCart className="mr-2 h-5 w-5" />
+                    Add to Cart
+                  </Button>
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    onClick={handleWishlistToggle}
+                    className={cn(inWishlist && "text-primary")}
+                  >
+                    <Heart className={cn("h-5 w-5", inWishlist && "fill-current")} />
+                  </Button>
+                </div>
               </div>
 
               <div className="grid grid-cols-3 gap-4 pt-4">
